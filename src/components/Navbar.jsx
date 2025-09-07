@@ -77,7 +77,7 @@ export default function () {
             <li>
               <details>
                 <summary>Categories</summary>
-                <ul className="p-2">
+                <ul className="p-2 z-50">
                   <li>
                     <Link>Web Design</Link>
                   </li>
