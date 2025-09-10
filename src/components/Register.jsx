@@ -1,17 +1,73 @@
 import React from "react";
 import { FaGithub, FaGoogle, FaFacebook } from "react-icons/fa6";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function Register() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const { signUpWithEmail, googleLogin } = useAuth();
+
+  const onSubmit = async (data) => {
+    try {
+      await signUpWithEmail(data.email, data.password);
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: "btn btn-success",
+          cancelButton: "btn btn-danger",
+        },
+        buttonsStyling: false,
+      });
+      swalWithBootstrapButtons
+        .fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, Register Me!",
+          cancelButtonText: "Not Now!",
+          reverseButtons: true,
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            swalWithBootstrapButtons.fire({
+              title: "Registration Successful!",
+              text: "Provide Your Email & Password To Login.",
+              icon: "success",
+            });
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            swalWithBootstrapButtons.fire({
+              title: "Cancelled",
+              text: "Registration Cancelled :)",
+              icon: "error",
+            });
+          }
+        });
+      navigate("/login");
+    } catch (error) {
+      console.error("registration failed", error.message);
+    }
+  };
+
+  // google login
+  const handleGoogleLogin = async () => {
+    try {
+      await googleLogin();
+      navigate("/");
+    } catch (error) {
+      console.error("login failed", error.message);
+    }
+  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-md rounded-lg">
@@ -79,18 +135,21 @@ export default function Register() {
         <div className="text-center">
           <p className="text-gray-600 mb-4">Or Sign Up With</p>
           <div className="flex items-center justify-between">
-            <button className="flex items-center px-4 py-2 text-white bg-red-500 rounded shadow-md hover:bg-red-600 space-x-2 cursor-pointer">
-              <FaGoogle />
+            <button
+              onClick={handleGoogleLogin}
+              className="flex items-center px-4 py-2 text-white bg-red-500 rounded shadow-md hover:bg-red-600 space-x-2 cursor-pointer mx-auto"
+            >
+              <FaGoogle/>
               <span>Google</span>
             </button>
-            <button className="flex items-center px-4 py-2 text-white bg-blue-500 rounded shadow-md hover:bg-blue-600 space-x-2 cursor-pointer">
+            {/* <button className="flex items-center px-4 py-2 text-white bg-blue-500 rounded shadow-md hover:bg-blue-600 space-x-2 cursor-pointer">
               <FaFacebook />
               <span>Facebook</span>
             </button>
             <button className="flex items-center px-4 py-2 text-white bg-gray-700 rounded shadow-md hover:bg-gray-900 space-x-2 cursor-pointer">
               <FaGithub />
               <span>Github</span>
-            </button>
+            </button> */}
           </div>
         </div>
         <p className="text-center text-gray-600 text-sm">

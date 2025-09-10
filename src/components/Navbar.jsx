@@ -1,7 +1,15 @@
 import React from "react";
 import { Link } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 export default function () {
+  const { user, logout } = useAuth();
+  console.log(user);
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <>
       <div className="navbar max-w-screen-2xl container mx-auto">
@@ -96,15 +104,34 @@ export default function () {
           </ul>
         </div>
         <div className="navbar-end space-x-4">
-          <Link
-            to="/login"
-            className="btn btn-outline btn-primary px-8 hidden sm:flex hover:bg-[#0F62FE]"
-          >
-            Log In
-          </Link>
-          <Link to="/pricing" className="btn btn-primary bg-[#0F62FE]">
-            Start Free Trail
-          </Link>
+          {user ? (
+            <>
+              <Link
+                to="/dashboard"
+                className="btn btn-outline btn-primary px-8 hidden sm:flex hover:bg-[#0F62FE]"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="btn btn-primary bg-[#0F62FE]"
+              >
+                Log Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="btn btn-outline btn-primary px-8 hidden sm:flex hover:bg-[#0F62FE]"
+              >
+                Log In
+              </Link>
+              <Link to="/pricing" className="btn btn-primary bg-[#0F62FE]">
+                Start Free Trail
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </>
